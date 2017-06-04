@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "ShopController.h"
 @interface NearController : UITableViewController
 
 @end

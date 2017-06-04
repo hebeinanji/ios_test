@@ -10,6 +10,8 @@
 #import "SettingController.h"
 #import "FeedBackViewController.h"
 #import "LoginCell.h"
+#import "LoginViewController.h"
+#import "UserDetailViewController.h"
 @interface MeController : UITableViewController
 
 @end

@@ -7,10 +7,12 @@
 //
 
 #import "LoginViewController.h"
-//#import "RegisterViewController.h"
-//#import "ResetPasswordViewController.h"
-
-
+#import "AccountController.h"
+//#import "User.h"
+#import "Screen.h"
+#import "MBProgressHUD.h"
+#import "AFNetworking.h"
+#import "AFHTTPSessionManager.h"
 
 @interface LoginViewController ()<UITextFieldDelegate,UIGestureRecognizerDelegate>
 {
@@ -41,6 +43,7 @@
     // Do any additional setup after loading the view.
     statue = YES;
     self.navigationItem.title = @"登录";
+    self.edgesForExtendedLayout = UIRectEdgeNone;
     self.view.backgroundColor =[UIColor colorWithRed:0.522 green:0.604 blue:0.745 alpha:1.00];
     [self creatUI];
     
@@ -48,14 +51,13 @@
 
 -(void)creatUI{
     UIImageView * backImageView = [[UIImageView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    backImageView.image = [UIImage imageNamed:@"登录"];
     backImageView.userInteractionEnabled = YES;
     self.view = backImageView;
-    //  旅行账号登录/无密码快捷登录
+    //  账号登录/无密码快捷登录
     UIButton * btn1 = [[UIButton alloc]initWithFrame:CGRectMake(4*INDEX, INDEX*2, WIDTH, INDEX*4)];
     [btn1 setTitle:@"旅行账号登录" forState:UIControlStateNormal];
     btn1.titleLabel.font = [UIFont systemFontOfSize:15.0];
-    //    btn1.backgroundColor = [UIColor redColor];
+//        btn1.backgroundColor = [UIColor redColor];
     [btn1 setTitleColor:[UIColor colorWithRed:0.353 green:0.408 blue:0.373 alpha:1.00] forState:UIControlStateNormal];
     [btn1 addTarget:self action:@selector(tapbtn1) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:btn1];
@@ -195,60 +197,64 @@
 }
 //获取验证码的回调事件
 -(void)tapbtn3{
-    NSString * str1 = @"http://10.209.74.209:8080/dftsms-web/IdentifyCodendIdentifyCode";
-    NSString *urlStr = [NSString stringWithFormat:@"%@,%@",str1,_textField1.text];
-    NSString *url = [NSString stringWithCString:[urlStr UTF8String] encoding:NSUnicodeStringEncoding];
-    NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutIntercal:10];
-    //异步链接(形式1,较少用)
-    [NSURLConnection sendAsynchronousRequest:requst queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-        self.imageView.image = [UIImage imageWithData:data];
-        // 解析
-        NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
-        NSLog(@"%@", dic);
-    }];
+    //请求数据
+    AFHTTPSessionManager * manager = [AFHTTPSessionManager manager];
+    // 转化为json
+    manager.requestSerializer = [AFJSONRequestSerializer serializer];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    NSDictionary * pay_id = [NSDictionary dictionaryWithObjectsAndKeys:@"手机号",@"phone", nil];
+  [manager GET:@"/dftsms-web/IdentifyCode/sendIdentifyCode" parameters:pay_id progress:^(NSProgress * _Nonnull downloadProgress) {
+      
+      
+      
+  } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+      
+  } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+      
+  }];
 }
 
 //登录的回调事件
--(void)tapbtn4{
-    [self.textField1 resignFirstResponder];
-    [self.textField2 resignFirstResponder];
-    if (statue) {
-        NSString * userID = [[AccountAndPasswordManager sharedManager] findUserByAccount:_textField1.text password:_textField2.text];
-        [User userOfMine].userID = [userID intValue];
-        // HUD 提示
-        self.HUD = [[MBProgressHUD alloc]initWithView:self.view];
-        [self.view addSubview:self.HUD];
-        //当前view置于后台
-        self.HUD.dimBackground = YES;
-        // 判断用户名 密码
-        if (userID != nil) {
-            //显示对话框
-            [self.HUD showAnimated:YES whileExecutingBlock:^{
-                sleep(1);
-            } completionBlock:^{
-                [self.HUD removeFromSuperview];
-                self.HUD = nil;
-                // 成功跳转
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"changeFlag" object:[NSNumber numberWithBool:YES]];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"changeUserIcon" object:[NSNumber numberWithBool:YES]];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"user" object:userID];
-                [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:@"loginStatue"];
-                [[NSUserDefaults standardUserDefaults] setObject:userID forKey:@"user"];
-                [self.navigationController popViewControllerAnimated:YES];
-            }];
-        }else{
-            //显示对话框
-            [self.HUD showAnimated:YES whileExecutingBlock:^{
-                sleep(1);
-                //设置文字
-                self.HUD.labelText = @"用户名或密码错误";
-                sleep(1);
-            } completionBlock:^{
-                [self.HUD removeFromSuperview];
-                self.HUD = nil;
-            }];
-        }
-    }else{
+-(void)tapbtn4 {
+//    [self.textField1 resignFirstResponder];
+//    [self.textField2 resignFirstResponder];
+//    if (statue) {
+//        NSString * userID = [[AccountAndPasswordManager sharedManager] findUserByAccount:_textField1.text password:_textField2.text];
+//        [User userOfMine].userID = [userID intValue];
+//        // HUD 提示
+//        self.HUD = [[MBProgressHUD alloc]initWithView:self.view];
+//        [self.view addSubview:self.HUD];
+//        //当前view置于后台
+//        self.HUD.dimBackground = YES;
+//        // 判断用户名 密码
+//        if (userID != nil) {
+//            //显示对话框
+//            [self.HUD showAnimated:YES whileExecutingBlock:^{
+//                sleep(1);
+//            } completionBlock:^{
+//                [self.HUD removeFromSuperview];
+//                self.HUD = nil;
+//                // 成功跳转
+//                [[NSNotificationCenter defaultCenter] postNotificationName:@"changeFlag" object:[NSNumber numberWithBool:YES]];
+//                [[NSNotificationCenter defaultCenter] postNotificationName:@"changeUserIcon" object:[NSNumber numberWithBool:YES]];
+//                [[NSNotificationCenter defaultCenter] postNotificationName:@"user" object:userID];
+//                [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:YES] forKey:@"loginStatue"];
+//                [[NSUserDefaults standardUserDefaults] setObject:userID forKey:@"user"];
+//                [self.navigationController popViewControllerAnimated:YES];
+//            }];
+//        }else{
+//            //显示对话框
+//            [self.HUD showAnimated:YES whileExecutingBlock:^{
+//                sleep(1);
+//                //设置文字
+//                self.HUD.labelText = @"用户名或密码错误";
+//                sleep(1);
+//            } completionBlock:^{
+//                [self.HUD removeFromSuperview];
+//                self.HUD = nil;
+//            }];
+//        }
+//    }else{
 //        [SMSSDK commitVerificationCode:_textField1.text phoneNumber:@"18231067191" zone:@"86" result:^(NSError *error) {
 //            if (!error) {
 //                NSLog(@"验证成功");
@@ -264,23 +270,29 @@
 //                // 弹出alertController
 //                [self presentViewController:alertController animated:YES completion:nil];
 //            }
-//        }];}
+//        }];
+//    }
 }
 //快速注册
-/*
+
 -(void)tapbtn5 {
+
     RegisterViewController  * register1 = [[RegisterViewController alloc]init];
     [self.navigationController pushViewController:register1 animated:YES];
+     
 }
- */
-/*
+ 
+
 //忘记密码
 -(void)tapbtn6 {
+    
     ResetPasswordViewController * resetPassword = [[ResetPasswordViewController alloc] init];
     [self.navigationController pushViewController:resetPassword animated:YES];
+
 }
 
 -(void)tapbtn7 {
+    
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:@"后续版本添加此功能" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction * okAlertAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }];
@@ -288,13 +300,14 @@
     //  弹出alertController
     [self presentViewController:alertController animated:YES completion:nil];
     
+    
 }
-*/
+
 -(void)tapbtn8:(UIButton *)sender {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:nil message:@"登录遇到问题" preferredStyle:UIAlertControllerStyleActionSheet];
     UIAlertAction * action1 = [UIAlertAction actionWithTitle:@"找回密码" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-//        ResetPasswordViewController * reset = [[ResetPasswordViewController alloc]init];
-//        [self.navigationController pushViewController:reset animated:YES];
+        ResetPasswordViewController * reset = [[ResetPasswordViewController alloc]init];
+        [self.navigationController pushViewController:reset animated:YES];
     }];
     UIAlertAction * action2 = [UIAlertAction actionWithTitle:@"语音验证码登录" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
     }];

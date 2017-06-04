@@ -28,7 +28,7 @@
     
     
     //首页导航
-    IndexController *indexVC = [[IndexController alloc] initWithStyle:UITableViewStyleGrouped];
+    IndexController *indexVC = [[IndexController alloc] init];
     UINavigationController *indexNav = [[UINavigationController alloc] initWithRootViewController:indexVC];
     indexNav.tabBarItem.image = [UIImage imageNamed:@"icon_tab_shouye_normal"];
     indexNav.tabBarItem.selectedImage = [UIImage imageNamed:@"icon_tab_shouye_highlight"];
@@ -44,7 +44,7 @@
     
     
     //订单
-    OrderController * orderVC = [[OrderController alloc] initWithStyle:UITableViewStyleGrouped];
+    OrderController * orderVC = [[OrderController alloc] init];
     UINavigationController * orderNaV = [[UINavigationController alloc] initWithRootViewController:orderVC];
     orderNaV.tabBarItem.image = [UIImage imageNamed:@"tab_icon_selection_normal"];
     orderNaV.tabBarItem.selectedImage = [UIImage imageNamed:@"tab_icon_selection_highlight"];

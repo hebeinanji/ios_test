@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface IndexController : UITableViewController
+@interface IndexController : UIViewController
 
 @end

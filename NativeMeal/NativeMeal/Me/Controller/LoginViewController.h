@@ -11,6 +11,10 @@
 //#import "User.h"
 #import "Screen.h"
 #import "MBProgressHUD.h"
+#import "AFNetworking.h"
+#import "RegisterViewController.h"
+#import "ResetPasswordViewController.h"
+
 
 @interface LoginViewController : UIViewController
 
